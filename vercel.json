@@ -29,9 +29,6 @@
       "src": "/api-docs",
       "dest": "backend/src/server.js"
     }
-  ],
-  "env": {
-    "MONGODB_URI": "@MONGODB_URI",
-    "NODE_ENV": "production"
-  }
+  ]
+
 }

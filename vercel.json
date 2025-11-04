@@ -7,7 +7,7 @@
       "config": {
         "includeFiles": [
           "src/routes/**",
-          "src/models/**",
+          "models/**",
           "src/swagger.js"
         ]
       }
@@ -23,19 +23,15 @@
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/dist/index.html"
+      "dest": "backend/src/server.js"
     },
     {
       "src": "/api-docs",
       "dest": "backend/src/server.js"
-    },
-    {
-      "src": "/api-docs/(.*)",
-      "dest": "backend/src/server.js"
     }
   ],
   "env": {
-    "MONGODB_URI": "mongodb+srv://lekardev_db_user:zWFnOakz3qjA5Bst@webapp.odxzqgl.mongodb.net/?appName=webapp",
-    "JWT_SECRET": "99d61bd1e75548474de6196d0f21cdacd6b53b81cf5ba316ff063faf0a95f628"
+    "MONGODB_URI": "@MONGODB_URI",
+    "NODE_ENV": "production"
   }
 }

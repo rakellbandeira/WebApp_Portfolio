@@ -4,7 +4,7 @@ const MySchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            default: 'Rakell Bandeira'
+            default: 'Rakell'
         },
         email: {
             type: String,

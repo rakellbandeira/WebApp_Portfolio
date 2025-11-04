@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const Project = require('../models/Project');
 const User = require('./models/User');
@@ -26,7 +25,7 @@ const User = require('./models/User');
   }
 }); */
 
-router.get('/projects', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     console.log('Fetching projects...');
     const projects = await Project.find();

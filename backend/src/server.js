@@ -31,19 +31,15 @@ const connectDB = async () => {
 
 connectDB();
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log('Server running on port ${PORT');
-});
+
+//Middlewares - functions that handle req and res efficiently
+app.use(cors());
+app.use(express.json());
 
 
 //swagger doc
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-
-//Middlewares - functions that handle req and res efficiently
-app.use(cors());
-app.use(express.json());
 
 app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
@@ -66,7 +62,7 @@ app.get('/', async (req, res) => {
     const projects = await Project.find();
     res.json(projects);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error fetching projects', error: error.message });
   }
 });
 
@@ -86,7 +82,6 @@ app.get('/api/about', async (req, res) => {
 //critical point in API, :id. Set API Documentation
 app.get('/api/projects/:id', async (req,res) => {
     try {
-        const Project = require('./models/Project');
         const project = await Project.findById(req.params.id);
 
         if(!project) {
@@ -139,7 +134,7 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-app.post('/', async (req, res) => {
+/* app.post('/', async (req, res) => {
   const project = new Project(req.body);
   try {
     const newProject = await project.save();
@@ -147,7 +142,7 @@ app.post('/', async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-});
+}); */
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
@@ -169,6 +164,17 @@ app.use('*', (req, res) => {
   });
 });
 
+
+const startServer = async () => {
+  await connectDB();
+  
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+startServer();
 
 module.exports = app;
 

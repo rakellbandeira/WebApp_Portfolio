@@ -3,14 +3,7 @@
   "builds": [
     {
       "src": "src/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "src/routes/**",
-          "models/**",
-          "src/swagger.js"
-        ]
-      }
+      "use": "@vercel/node"
     }
   ],
   "buildCommand": "npm run build",
@@ -22,11 +15,15 @@
       "dest": "src/server.js"
     },
     {
-      "src": "/(.*)",
+      "src": "/api-docs",
       "dest": "src/server.js"
     },
     {
-      "src": "/api-docs",
+      "src": "/",
+      "dest": "src/server.js"
+    },
+    {
+      "src": "/(.*)",
       "dest": "src/server.js"
     }
   ]

@@ -1,5 +1,18 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "src/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "src/routes/**",
+          "src/models/**",
+          "src/swagger.js"
+        ]
+      }
+    }
+  ],
   "buildCommand": "npm run build",
   "installCommand": "npm install && npm install --prefix frontend && npm install --prefix backend",
   "outputDirectory": "frontend/dist",
@@ -11,6 +24,10 @@
     {
       "src": "/(.*)",
       "dest": "frontend/dist/index.html"
+    },
+    {
+      "src": "/api-docs",
+      "dest": "src/server.js"
     }
   ],
   "env": {

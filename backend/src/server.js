@@ -2,20 +2,44 @@ const express =  require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const ContactSubmission = require('./models/ContactSubmission');
+const projectRoutes = require('./routes/projectRoutes');
+const userRoutes = require('./routes/userRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 require('dotenv').config();
 
 
 const app = express();
 
+//swagger doc
+if (process.env.NODE_ENV == 'production' || process.env.NODE_ENV !== 'production') {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
+
 //Middlewares - functions that handle req and res efficiently
 app.use(cors());
 app.use(express.json());
+
+//swagger routes
+app.use('/api/projects', projectRoutes);
+app.use('/api/users', userRoutes);
+
 
 // Models - to handle communication with MongoDB and avoid writing raw database queries everywhere
 const User = require('./models/User');
 const Project = require('./models/Project');
 
+
 //Routes
+app.get('/api/projects', async (req, res) => {
+    try {
+        const projects = await Project.find();
+        res.json(projects);
+    } catch (error){
+        res.status(500).json({message: 'Error fetching Projects', error: error.message});        
+    }
+});
+
 app.get('/api/about', async (req, res) => {
     try {
         const user = await User.findOne({});
@@ -29,15 +53,7 @@ app.get('/api/about', async (req, res) => {
     }
 });
 
-app.get('/api/projects', async (req, res) => {
-    try {
-        const Project = require('./models/Project');
-        const projects = await Project.find();
-        res.json(projects);
-    } catch (error){
-        res.status(500).json({message: 'Error fetching Projects', error: error.message});        
-    }
-});
+
 
 //critical point in API, :id. Set API Documentation
 app.get('/api/projects/:id', async (req,res) => {

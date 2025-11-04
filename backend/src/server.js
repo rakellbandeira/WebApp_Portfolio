@@ -12,7 +12,7 @@ require('dotenv').config();
 const app = express();
 
 //swagger doc
-if (process.env.NODE_ENV == 'production' || process.env.NODE_ENV !== 'production') {
+if  (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 

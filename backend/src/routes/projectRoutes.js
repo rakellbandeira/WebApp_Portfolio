@@ -5,16 +5,16 @@ const Project = require('../models/Project');
 const User = require('./models/User');
 
 
-router.get('/', async (req, res) => {
+/* router.get('/', async (req, res) => {
   try {
     const projects = await Project.find();
     res.json(projects);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+}); */
 
-router.get('/about', async (req, res) => {
+/* router.get('/about', async (req, res) => {
   try {
     console.log('Fetching user profile...');
     const user = await User.findOne();
@@ -24,7 +24,7 @@ router.get('/about', async (req, res) => {
     console.error('User fetch error:', error);
     res.status(500).json({ message: 'Error fetching user', error: error.message });
   }
-});
+}); */
 
 router.get('/projects', async (req, res) => {
   try {
@@ -38,7 +38,7 @@ router.get('/projects', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+/* router.post('/', async (req, res) => {
   const project = new Project(req.body);
   try {
     const newProject = await project.save();
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-});
+}); */
 
 // Add other CRUD routes later (update, delete, get by ID)
 

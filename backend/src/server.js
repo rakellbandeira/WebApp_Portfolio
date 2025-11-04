@@ -15,20 +15,21 @@ require('dotenv').config();
 const app = express();
 
 //MongoDB Connection
-try {
+const connectDB = async () => {
+  try {
     console.log('Attempting to connect to MongoDB...');
-    console.log('Connection URI:', process.env.MONGODB_URI.substring(0, 20) + '...'); // Partially hide sensitive info
-    
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    
     console.log('✅ MongoDB Connected Successfully');
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error);
     process.exit(1);
   }
+};
+
+connectDB();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
@@ -51,13 +52,22 @@ app.use('/api/users', userRoutes);
 
 
 //Routes
-app.get('/api/projects', async (req, res) => {
+/* app.get('/api/projects', async (req, res) => {
     try {
         const projects = await Project.find();
         res.json(projects);
     } catch (error){
         res.status(500).json({message: 'Error fetching Projects', error: error.message});        
     }
+}); */
+
+app.get('/', async (req, res) => {
+  try {
+    const projects = await Project.find();
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 app.get('/api/about', async (req, res) => {
@@ -72,8 +82,6 @@ app.get('/api/about', async (req, res) => {
         res.status(500).json({message: 'Error fetching User data'});        
     }
 });
-
-
 
 //critical point in API, :id. Set API Documentation
 app.get('/api/projects/:id', async (req,res) => {
@@ -128,6 +136,16 @@ app.post('/api/contact', async (req, res) => {
       message: 'Error processing contact form', 
       error: error.message 
     });
+  }
+});
+
+app.post('/', async (req, res) => {
+  const project = new Project(req.body);
+  try {
+    const newProject = await project.save();
+    res.status(201).json(newProject);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 });
 

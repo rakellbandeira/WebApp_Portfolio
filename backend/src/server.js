@@ -11,18 +11,16 @@ require('dotenv').config();
 
 const app = express();
 
+
 //swagger doc
-if  (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-}
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 //Middlewares - functions that handle req and res efficiently
 app.use(cors());
 app.use(express.json());
 
-//swagger routes
-app.use('/api/projects', projectRoutes);
-app.use('/api/users', userRoutes);
+
 
 
 // Models - to handle communication with MongoDB and avoid writing raw database queries everywhere

@@ -1,6 +1,7 @@
 const express =  require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const ContactSubmission = require('./models/ContactSubmission');
 require('dotenv').config();
 
 
@@ -61,21 +62,32 @@ app.get('/api/projects/:id', async (req,res) => {
 // Contact Form Endpoint
 app.post('/api/contact', async (req, res) => {
   try {
-    const { email, message } = req.body;
+    const { name, email, message } = req.body;
 
     // Basic validation
-    if (!email || !message) {
-      return res.status(400).json({ message: 'Email and message are required' });
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // For now, just logging a message, later set real email sending
-    console.log('Contact Form Submission:', { email, message });
+    // For now, just logging a message, later set nodemailer or alternative email sending
+    console.log('Contact Form Submission:', { name, email, message });
+    // Create new contact submission
+    const newSubmission = new ContactSubmission({
+      name,
+      email,
+      message,
+      ipAddress: req.ip // Capture IP address
+    });
+    // Save to database
+    await newSubmission.save();
+
 
     res.status(200).json({ 
       message: 'Message received successfully',
-      submission: { email, message }
+      submissionId: newSubmission._id
     });
   } catch (error) {
+    console.error('Contact form submission error:', error);
     res.status(500).json({ 
       message: 'Error processing contact form', 
       error: error.message 

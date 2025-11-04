@@ -4,12 +4,10 @@ const MySchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true,
             default: 'Rakell Bandeira'
         },
         email: {
             type: String,
-            required: true,
             default: 'rakellbandeira@gmail.com'
         },
         description: {

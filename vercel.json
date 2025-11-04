@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/src/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/dist",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/src/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/dist/index.html"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "@mongodb_connection_string",
+    "JWT_SECRET": "@jwt_secret"
+  }
+}

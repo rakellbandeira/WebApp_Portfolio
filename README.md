@@ -5,12 +5,13 @@
 
 - YouTube demonstration:
 
-[CSE 310 - Applied Programming - W01](https://www.youtube.com/watch?v=-VLoUi50jS0)
+[]()
 
 # Development Environment
 - Tools used: VSCode, Vercel, MongoDB
 
-- Programming languages used: NodeJS, ReactJS, TypeScript, HTML, CSS
+- Programming languages used: NodeJS, ExpressJS, ReactJS, HTML, CSS
 
 # Useful Websites
-- None for now
+- [Creating Model with Mongoose Schema](https://www.mongodb.com/pt-br/docs/drivers/node/current/integrations/mongoose-get-started/)
+- [Using middleware](https://expressjs.com/en/guide/using-middleware.html)

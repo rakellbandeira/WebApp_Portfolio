@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import mongoose from 'mongoose';
-//import ContactSubmission from '../models/ContactSubmission.js';
 import projectRoutes from './routes/projectRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import swaggerUi from 'swagger-ui-express';

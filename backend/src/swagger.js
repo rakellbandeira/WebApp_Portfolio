@@ -18,7 +18,7 @@ const options = {
     servers: [
       {
         url: process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}/api` 
+          ? `https://${process.env.VERCEL_URL}/api-docs` 
           : 'http://localhost:5000/api',
         description: process.env.VERCEL_URL 
           ? 'Production server' 
@@ -26,7 +26,7 @@ const options = {
       }
     ]
   },
-  apis: ['./routes/*.js'] // Path to the API routes files with JSDoc comments
+  apis: ['./src/routes/*.js'] // Path to the API routes files with JSDoc comments
 };
 
 console.log('Swagger options:', options);

@@ -1,5 +1,6 @@
 const express =  require('express');
 const cors = require('cors');
+const path = require('path');
 const mongoose = require('mongoose');
 const ContactSubmission = require('./models/ContactSubmission');
 const projectRoutes = require('./routes/projectRoutes');
@@ -147,6 +148,7 @@ app.post('/api/contact', async (req, res) => {
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   res.status(500).json({
     message: 'An unexpected error occurred',
     error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'

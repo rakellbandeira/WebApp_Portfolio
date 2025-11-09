@@ -1,4 +1,10 @@
-const swaggerJsdoc = require('swagger-jsdoc');
+import swaggerJsdoc from 'swagger-jsdoc';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 console.log('Swagger file is being processed now');
 
 const options = {
@@ -20,7 +26,7 @@ const options = {
       }
     ]
   },
-  apis: ['./src/routes/*.js', './src/models/*.js'] // Path to the API routes and model files
+  apis: ['./routes/*.js'] // Path to the API routes files with JSDoc comments
 };
 
 console.log('Swagger options:', options);
@@ -28,4 +34,4 @@ console.log('Swagger options:', options);
 const swaggerSpec = swaggerJsdoc(options);
 console.log('Swagger spec generated');
 
-module.exports = swaggerSpec;
+export default swaggerSpec;

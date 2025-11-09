@@ -1,52 +1,75 @@
-const express = require('express');
+import express from 'express';
+import Project from '../../models/Project.js';
+
 const router = express.Router();
-const Project = require('../models/Project');
-const User = require('./models/User');
 
-
-/* router.get('/', async (req, res) => {
-  try {
-    const projects = await Project.find();
-    res.json(projects);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}); */
-
-/* router.get('/about', async (req, res) => {
-  try {
-    console.log('Fetching user profile...');
-    const user = await User.findOne();
-    console.log('User found:', user ? user.name : 'No user');
-    res.json(user);
-  } catch (error) {
-    console.error('User fetch error:', error);
-    res.status(500).json({ message: 'Error fetching user', error: error.message });
-  }
-}); */
-
+/**
+ * @swagger
+ * /api/projects:
+ *   get:
+ *     summary: Get all projects
+ *     description: Retrieve a list of all projects
+ *     tags:
+ *       - Projects
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all projects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       500:
+ *         description: Error fetching projects
+ */
 router.get('/', async (req, res) => {
   try {
-    console.log('Fetching projects...');
     const projects = await Project.find();
-    console.log(`Found ${projects.length} projects`);
     res.json(projects);
   } catch (error) {
-    console.error('Projects fetch error:', error);
     res.status(500).json({ message: 'Error fetching projects', error: error.message });
   }
 });
 
-/* router.post('/', async (req, res) => {
-  const project = new Project(req.body);
+/**
+ * @swagger
+ * /api/projects/{id}:
+ *   get:
+ *     summary: Get a project by ID
+ *     description: Retrieve a specific project by its ID
+ *     tags:
+ *       - Projects
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The project ID
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the project
+ *       404:
+ *         description: Project not found
+ *       500:
+ *         description: Error fetching project details
+ */
+router.get('/:id', async (req, res) => {
   try {
-    const newProject = await project.save();
-    res.status(201).json(newProject);
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    res.json(project);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({
+      message: 'Error fetching project details',
+      error: error.message
+    });
   }
-}); */
+});
 
-// Add other CRUD routes later (update, delete, get by ID)
-
-module.exports = router;
+export default router;

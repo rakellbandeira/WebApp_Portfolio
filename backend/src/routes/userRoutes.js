@@ -1,8 +1,29 @@
-const express = require('express');
+import express from 'express';
+import User from '../../models/User.js';
+
 const router = express.Router();
-const User = require('../models/User');
 
 
+/**
+ * @swagger
+ * /api/user:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieve a list of all users
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       500:
+ *         description: Error fetching users
+ */
 router.get('/', async (req, res) => {
   try {
     const user = await User.findOne();
@@ -12,4 +33,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

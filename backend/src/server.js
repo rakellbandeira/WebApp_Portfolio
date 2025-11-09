@@ -1,17 +1,17 @@
-const express =  require('express');
-const cors = require('cors');
-const path = require('path');
-const mongoose = require('mongoose');
-const ContactSubmission = require('./models/ContactSubmission');
-const projectRoutes = require('./routes/projectRoutes');
-const userRoutes = require('./routes/userRoutes');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swagger');
-// Models - to handle communication with MongoDB and avoid writing raw database queries everywhere
-const User = require('./models/User');
-const Project = require('./models/Project');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import mongoose from 'mongoose';
+//import ContactSubmission from '../models/ContactSubmission.js';
+import projectRoutes from './routes/projectRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
+import User from '../models/User.js';
+import Project from '../models/Project.js';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 const app = express();
 
@@ -178,7 +178,7 @@ const startServer = async () => {
 
 startServer();
 
-module.exports = app;
+export default app;
 
 
 

@@ -8,7 +8,7 @@ const router = express.Router();
  * /api/projects:
  *   get:
  *     summary: Get all projects
- *     description: Retrieve a list of all projects
+ *     description: Retrieve a list of all projects from the portfolio
  *     tags:
  *       - Projects
  *     responses:
@@ -20,6 +20,17 @@ const router = express.Router();
  *               type: array
  *               items:
  *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   stack:
+ *                     type: array
+ *                     items:
+ *                       type: string
  *       500:
  *         description: Error fetching projects
  */
@@ -37,7 +48,7 @@ router.get('/', async (req, res) => {
  * /api/projects/{id}:
  *   get:
  *     summary: Get a project by ID
- *     description: Retrieve a specific project by its ID
+ *     description: Retrieve a specific project by its MongoDB ID
  *     tags:
  *       - Projects
  *     parameters:
@@ -46,10 +57,14 @@ router.get('/', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: The project ID
+ *         description: The project MongoDB ID
  *     responses:
  *       200:
  *         description: Successfully retrieved the project
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
  *       404:
  *         description: Project not found
  *       500:

@@ -10,12 +10,8 @@
       "dest": "backend/src/server.js"
     },
     {
-      "src": "/api-docs",
+      "src": "/api-docs(.*)",
       "dest": "backend/src/server.js"
-    },
-    {
-      "src": "/",
-      "dest": "frontend/index.html"
     },
     {
       "src": "/(.*)",

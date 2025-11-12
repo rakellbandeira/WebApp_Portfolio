@@ -98,8 +98,27 @@ app.get('/api/projects/:id', async (req,res) => {
 }); 
 
 
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  res.status(500).json({
+    message: 'An unexpected error occurred',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
+  });
+});
+
+app.use('*', (req, res) => {
+  console.log('Catch-all route hit');
+  res.status(404).json({
+    message: 'Route not found',
+    path: req.originalUrl,
+    method: req.method
+  });
+});
+
+
 // Contact Form Endpoint
-app.post('/api/contact', async (req, res) => {
+/* app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
@@ -132,7 +151,7 @@ app.post('/api/contact', async (req, res) => {
       error: error.message 
     });
   }
-});
+}); */
 
 /* app.post('/', async (req, res) => {
   const project = new Project(req.body);
@@ -143,28 +162,6 @@ app.post('/api/contact', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }); */
-
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  res.status(500).json({
-    message: 'An unexpected error occurred',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
-  });
-});
-
-
-// Catch-all Route for Debugging
-app.use('*', (req, res) => {
-  console.log('Catch-all route hit');
-  res.status(404).json({
-    message: 'Route not found',
-    path: req.originalUrl,
-    method: req.method
-  });
-});
-
 
 const startServer = async () => {
   await connectDB();

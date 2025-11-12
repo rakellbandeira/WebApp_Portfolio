@@ -18,8 +18,8 @@ const options = {
     servers: [
       {
         url: process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}/api-docs` 
-          : 'http://localhost:5000/api',
+          ? `https://${process.env.VERCEL_URL}` 
+          : 'http://localhost:5000',
         description: process.env.VERCEL_URL 
           ? 'Production server' 
           : 'Local development server'

@@ -26,7 +26,7 @@ const options = {
       }
     ]
   },
-  apis: ['./src/routes/*.js'] // Path to the API routes files with JSDoc comments
+  apis: [`${__dirname}/routes/*.js`] // Path to the API routes files with JSDoc comments
 };
 
 console.log('Swagger options:', options);

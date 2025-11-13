@@ -3,11 +3,7 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install && npm install --prefix frontend && npm install --prefix backend",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "backend/src/server.js": {
-      "runtime": "@vercel/node@2.15.8"
-    }
-  },
+  
   "routes": [
     {
       "src": "/api/(.*)",

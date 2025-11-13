@@ -1,31 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../services/axiosConfig';
 
-// Define an interface matching the Project model
+// interface matching the Project model
 interface Project {
   _id: string;
   title: string;
   description: string;
-  stack: string;
+  stack: string[];
   githubLink?: string;
   demoLink?: string;
+  featured?: boolean;
 }
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  //In case of error in fetching data
+  //In case of error
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        console.log('Fetching projects from:', apiClient.defaults.baseURL + '/api/projects');
         
-        const response = await axios.get<Project[]>('/api/projects'); //critical point!!!
+        const response = await apiClient.get<Project[]>('/api/projects');
+        console.log('Projects fetched successfully:', response.data);
         setProjects(response.data);
         setIsLoading(false);
       } catch (err) {
+        console.error('Error fetching projects:', err);
         setError('Failed to fetch projects');
         setIsLoading(false);
       }
@@ -45,7 +49,10 @@ const Projects: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-black text-console-text flex items-center justify-center">
-        {error}
+        <div className="text-center">
+          <p className="text-console-highlight mb-4">{error}</p>
+          <p className="text-sm text-gray-400">Check the browser console for more details</p>
+        </div>
       </div>
     );
   }
@@ -70,8 +77,21 @@ const Projects: React.FC = () => {
                 </h3>
               </Link>
               <p className="text-sm text-gray-400 mt-2">
-                Technologies: {project.stack}
+                {project.description}
               </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Technologies: {Array.isArray(project.stack) ? project.stack.join(', ') : project.stack}
+              </p>
+              {project.githubLink && (
+                <a 
+                  href={project.githubLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-console-highlight text-sm hover:underline mt-2 inline-block"
+                >
+                  GitHub
+                </a>
+              )}
             </div>
           ))}
         </div>

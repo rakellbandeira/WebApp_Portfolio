@@ -45,25 +45,8 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
 
 
-
-
-//Routes
-/* app.get('/api/projects', async (req, res) => {
-    try {
-        const projects = await Project.find();
-        res.json(projects);
-    } catch (error){
-        res.status(500).json({message: 'Error fetching Projects', error: error.message});        
-    }
-}); */
-
-app.get('/', async (req, res) => {
-  try {
-    const projects = await Project.find();
-    res.json(projects);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching projects', error: error.message });
-  }
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Backend is running' });
 });
 
 app.get('/api/about', async (req, res) => {
@@ -80,7 +63,7 @@ app.get('/api/about', async (req, res) => {
 });
 
 //critical point in API, :id. Set API Documentation
-app.get('/api/projects/:id', async (req,res) => {
+/* app.get('/api/projects/:id', async (req,res) => {
     try {
         const project = await Project.findById(req.params.id);
 
@@ -96,7 +79,7 @@ app.get('/api/projects/:id', async (req,res) => {
         });
     }
 }); 
-
+ */
 
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);
@@ -108,7 +91,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use('*', (req, res) => {
-  console.log('Catch-all route hit');
+  console.log('Catch-all route hit', req.method, req.path);
   res.status(404).json({
     message: 'Route not found',
     path: req.originalUrl,

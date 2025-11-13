@@ -1,20 +1,22 @@
 import axios from 'axios';
 
-// Setting the base URL based on environment
+// base URL based on environment
 const getBaseURL = () => {
+  // Check if running in browser
   if (typeof window !== 'undefined') {
-    // Browser environment
-    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1';
     
-    if (isProduction) {
-      // Vercel production:: same origin
-      return window.location.origin;
-      
-    } else {
-      // For local development
+    if (isLocalhost) {
+      // Local development
       return 'http://localhost:5000';
+    } else {
+      // Production (Vercel) same origin
+      return window.location.origin;
     }
   }
+  
+  // Server-side fallback
   return '';
 };
 
@@ -24,5 +26,11 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Log for debugging
+if (typeof window !== 'undefined') {
+  console.log('Axios Base URL:', apiClient.defaults.baseURL);
+  console.log('Environment:', window.location.hostname);
+}
 
 export default apiClient;

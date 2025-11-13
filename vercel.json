@@ -3,10 +3,7 @@
   "buildCommand": "npm run build && npm run build --prefix backend",
   "installCommand": "npm install && npm install --prefix frontend && npm install --prefix backend",
   "outputDirectory": "frontend/dist",
-  "env": {
-    "MONGODB_URI": "@MONGODB_URI",
-    "JWT_SECRET": "@JWT_SECRET"
-  },
+  
   "routes": [
     {
       "src": "^/api/(.*?)$",

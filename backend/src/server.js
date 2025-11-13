@@ -1,165 +1,232 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import mongoose from 'mongoose';
-import projectRoutes from './routes/projectRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './swagger.js';
-import User from '../models/User.js';
-import Project from '../models/Project.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const app = express();
 
-//MongoDB Connection
+// Middleware
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
+app.use(express.json());
+
+// MongoDB connection state
+let isConnected = false;
+
+// Connect to MongoDB
 const connectDB = async () => {
+  if (isConnected) {
+    console.log('Using existing MongoDB connection');
+    return;
+  }
+
   try {
-    console.log('Attempting to connect to MongoDB...');
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is not set');
+    }
+
+    console.log('Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     });
+    isConnected = true;
     console.log('✅ MongoDB Connected Successfully');
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error);
-    process.exit(1);
+    isConnected = false;
+    throw error;
   }
 };
 
-connectDB();
+// Import models AFTER dotenv.config()
+import Project from '../models/Project.js';
+import User from '../models/User.js';
 
-
-//Middlewares - functions that handle req and res efficiently
-app.use(cors());
-app.use(express.json());
-
-
-//swagger doc
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-
-app.use('/api/projects', projectRoutes);
-app.use('/api/users', userRoutes);
-
-
+// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend is running' });
 });
 
-app.get('/api/about', async (req, res) => {
-    try {
-        const user = await User.findOne({});
-        if (!user) {
-            return res.status(404).json({ message: 'User profile not found', error: message });
-        }
-
-        res.json(user);
-    } catch (error){
-        res.status(500).json({message: 'Error fetching User data'});        
-    }
+// GET all projects
+app.get('/api/projects', async (req, res) => {
+  try {
+    await connectDB();
+    const projects = await Project.find();
+    return res.status(200).json(projects);
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching projects', 
+      error: error.message 
+    });
+  }
 });
 
-//critical point in API, :id. Set API Documentation
-/* app.get('/api/projects/:id', async (req,res) => {
-    try {
-        const project = await Project.findById(req.params.id);
+// GET project by ID
+app.get('/api/projects/:id', async (req, res) => {
+  try {
+    await connectDB();
+    const project = await Project.findById(req.params.id);
 
-        if(!project) {
-            return res.status(404).json({ message: 'Project not found'});
-        }
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
 
-        res.json(project);
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error fetching project details', 
-            error: error.message 
+    return res.status(200).json(project);
+  } catch (error) {
+    console.error('Error fetching project:', error);
+    return res.status(500).json({
+      message: 'Error fetching project details',
+      error: error.message
+    });
+  }
+});
+
+// CREATE project
+app.post('/api/projects', async (req, res) => {
+  try {
+    await connectDB();
+    const { title, description, stack, githubLink, demoLink, featured } = req.body;
+
+    // Validate
+    if (!title || !description || !stack) {
+      return res.status(400).json({
+        message: 'Missing required fields: title, description, and stack are required'
+      });
+    }
+
+    if (!Array.isArray(stack) || stack.length === 0) {
+      return res.status(400).json({
+        message: 'Stack must be a non-empty array of strings'
+      });
+    }
+
+    const newProject = new Project({
+      title,
+      description,
+      stack,
+      githubLink,
+      demoLink,
+      featured: featured || false
+    });
+
+    const savedProject = await newProject.save();
+    return res.status(201).json({
+      message: 'Project created successfully',
+      project: savedProject
+    });
+  } catch (error) {
+    console.error('Error creating project:', error);
+    return res.status(500).json({
+      message: 'Error creating project',
+      error: error.message
+    });
+  }
+});
+
+// UPDATE project
+app.put('/api/projects/:id', async (req, res) => {
+  try {
+    await connectDB();
+    const { title, description, stack, githubLink, demoLink, featured } = req.body;
+
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    if (title) project.title = title;
+    if (description) project.description = description;
+    if (stack) {
+      if (!Array.isArray(stack) || stack.length === 0) {
+        return res.status(400).json({
+          message: 'Stack must be a non-empty array of strings'
         });
+      }
+      project.stack = stack;
     }
-}); 
- */
+    if (githubLink !== undefined) project.githubLink = githubLink;
+    if (demoLink !== undefined) project.demoLink = demoLink;
+    if (featured !== undefined) project.featured = featured;
 
-app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  res.status(500).json({
-    message: 'An unexpected error occurred',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
-  });
+    const updatedProject = await project.save();
+    return res.status(200).json({
+      message: 'Project updated successfully',
+      project: updatedProject
+    });
+  } catch (error) {
+    console.error('Error updating project:', error);
+    return res.status(500).json({
+      message: 'Error updating project',
+      error: error.message
+    });
+  }
 });
 
+// DELETE project
+app.delete('/api/projects/:id', async (req, res) => {
+  try {
+    await connectDB();
+    const project = await Project.findByIdAndDelete(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    return res.status(200).json({
+      message: 'Project deleted successfully',
+      project: project
+    });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    return res.status(500).json({
+      message: 'Error deleting project',
+      error: error.message
+    });
+  }
+});
+
+// GET user profile
+app.get('/api/users', async (req, res) => {
+  try {
+    await connectDB();
+    const user = await User.findOne({});
+    if (!user) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching user data', 
+      error: error.message 
+    });
+  }
+});
+
+// Catch-all for unmatched routes
 app.use('*', (req, res) => {
-  console.log('Catch-all route hit', req.method, req.path);
-  res.status(404).json({
+  console.log('Route not found:', req.method, req.path);
+  return res.status(404).json({
     message: 'Route not found',
     path: req.originalUrl,
     method: req.method
   });
 });
 
-
-// Contact Form Endpoint
-/* app.post('/api/contact', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-
-    // Basic validation
-    if (!name || !email || !message) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    // For now, just logging a message, later set nodemailer or alternative email sending
-    console.log('Contact Form Submission:', { name, email, message });
-    // Create new contact submission
-    const newSubmission = new ContactSubmission({
-      name,
-      email,
-      message,
-      ipAddress: req.ip // Capture IP address
-    });
-    // Save to database
-    await newSubmission.save();
-
-
-    res.status(200).json({ 
-      message: 'Message received successfully',
-      submissionId: newSubmission._id
-    });
-  } catch (error) {
-    console.error('Contact form submission error:', error);
-    res.status(500).json({ 
-      message: 'Error processing contact form', 
-      error: error.message 
-    });
-  }
-}); */
-
-/* app.post('/', async (req, res) => {
-  const project = new Project(req.body);
-  try {
-    const newProject = await project.save();
-    res.status(201).json(newProject);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-}); */
-
-const startServer = async () => {
-  await connectDB();
-  
+// For local development only
+if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-};
+}
 
-startServer();
-
+// Export for Vercel
 export default app;
-
-
-
-
-
